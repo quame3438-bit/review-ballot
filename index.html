@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#174c8f">
+  <title>考核结果统计</title>
+  <meta name="description" content="导入人员名单，快速录入选票并统计每人票数。">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23174c8f'/%3E%3Cpath d='M16 33l10 10 22-24' fill='none' stroke='white' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <style>
+    :root{--blue:#174c8f;--blue2:#2371c9;--soft:#eef5fc;--ink:#172033;--muted:#6b7485;--line:#dbe3ee;--danger:#c93636;--ok:#15845b;--shadow:0 10px 30px rgba(25,55,92,.09)}
+    *{box-sizing:border-box} body{margin:0;background:#f4f7fb;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;font-size:16px}
+    button,input,textarea,select{font:inherit} button{cursor:pointer}.wrap{width:min(760px,100%);margin:auto;padding:18px 14px 52px}
+    header{display:flex;align-items:center;justify-content:space-between;margin:2px 2px 16px}h1{font-size:1.55rem;margin:0;color:#123d72}.badge{font-size:.8rem;color:var(--blue);background:#dfeeff;padding:6px 9px;border-radius:999px}
+    .card{background:#fff;border:1px solid #e4eaf2;border-radius:16px;padding:16px;margin:12px 0;box-shadow:var(--shadow)}
+    .section-title{font-weight:750;margin:0 0 11px;display:flex;align-items:center;gap:8px}.num{display:grid;place-items:center;width:25px;height:25px;border-radius:8px;background:var(--blue);color:#fff;font-size:.85rem}
+    label{display:block;font-weight:650;font-size:.92rem;margin-bottom:7px}.row{display:flex;gap:8px;align-items:stretch}.row>*:first-child{flex:1;min-width:0}
+    input,textarea,select{width:100%;border:1px solid #cfd9e6;background:#fff;border-radius:11px;color:var(--ink);outline:none;padding:11px 12px;min-height:44px}
+    input:focus,textarea:focus,select:focus{border-color:var(--blue2);box-shadow:0 0 0 3px rgba(35,113,201,.12)}
+    textarea{resize:vertical;line-height:1.65}.vote-box{min-height:164px}.roster-box{min-height:120px}
+    .btn{border:0;border-radius:10px;padding:10px 13px;font-weight:700;white-space:nowrap;background:#eaf1f9;color:#21496f}.btn.primary{background:var(--blue);color:#fff}.btn.green{background:var(--ok);color:#fff}.btn.danger{color:var(--danger);background:#fff0f0}.btn:active{transform:translateY(1px)}
+    .button-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:9px}.category-actions{grid-template-columns:repeat(5,1fr)}.category-actions .btn{padding-inline:6px}.hint{color:var(--muted);font-size:.84rem;line-height:1.5;margin:7px 1px 0}.message{min-height:22px;text-align:center;color:var(--ok);font-weight:650;font-size:.9rem;margin-top:8px}.hidden{display:none!important}
+    .ballot-total{margin-top:16px;padding-top:15px;border-top:1px solid var(--line)}.subsection-title{margin:0 0 10px;font-size:1rem;color:#263d59}.ballot-total-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.total-field{margin:0;color:var(--muted);font-size:.8rem}.total-field input{margin-top:6px;text-align:center;font-weight:800;color:var(--blue);padding-inline:6px}.total-field input[readonly]{background:var(--soft)}.return-parts{min-height:74px;max-height:120px;margin-top:10px;padding-block:8px}
+    .summary-name{margin-bottom:10px}.person-combo{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 46px}.person-combo input{border-radius:11px 0 0 11px}.combo-toggle{border:1px solid #cfd9e6;border-left:0;border-radius:0 11px 11px 0;background:#edf4fc;color:var(--blue);font-size:1rem;font-weight:800}.combo-menu{position:absolute;z-index:20;left:0;right:0;top:calc(100% + 5px);max-height:240px;overflow-y:auto;padding:6px;background:#fff;border:1px solid #cfd9e6;border-radius:11px;box-shadow:0 12px 28px rgba(22,50,84,.18)}.combo-option{display:block;width:100%;border:0;border-radius:8px;background:#fff;text-align:left;padding:10px 12px;color:var(--ink);font-weight:650}.combo-option:active,.combo-option:hover{background:var(--soft)}.combo-empty{padding:11px;color:var(--muted);text-align:center}.summary-result-grid{display:grid;grid-template-columns:1fr}.summary-result-grid .total-field input{font-size:1.05rem}.summary-clear{display:flex;justify-content:flex-end;margin-top:9px}
+    .cloud-login{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px}.cloud-topline{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px}.cloud-user{font-weight:700;color:#66716e;overflow-wrap:anywhere}.cloud-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}.cloud-actions .btn{width:100%;min-width:0;padding:9px 3px;font-size:.84rem}.cloud-actions .long-label{font-size:.75rem}.cloud-status{margin-top:10px;color:var(--muted);font-size:.84rem;line-height:1.45}
+    .upload{position:relative;overflow:hidden}.upload input{position:absolute;inset:0;opacity:0;cursor:pointer}
+    .submit{width:100%;margin-top:10px;min-height:48px;font-size:1.05rem}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.metric{background:var(--soft);border-radius:11px;padding:10px;text-align:center}.metric b{display:block;color:var(--blue);font-size:1.25rem}.metric span{font-size:.78rem;color:var(--muted)}
+    .search-result{margin:10px 0 0;padding:12px;background:#f1f7ff;border:1px solid #d6e8fb;border-radius:11px;display:none}.search-result strong{color:var(--blue);font-size:1.12rem}
+    .people{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:12px}.letter-group{grid-column:1/-1;display:flex;align-items:center;gap:9px;color:var(--blue);font-size:1rem;font-weight:850;margin-top:7px}.letter-group:first-child{margin-top:0}.letter-group::after{content:"";height:1px;flex:1;background:#d7e4f3}.letter-mark{display:grid;place-items:center;width:29px;height:29px;border-radius:9px;background:#e5f0fc}.person{height:44px;border:1px solid #cbd8e8;border-radius:11px;background:#fff;color:#20354f;font-weight:750;padding:3px;overflow:hidden;line-height:1.05}.person.long{font-size:.86rem}.person.selected{background:var(--blue);border-color:var(--blue);color:#fff}
+    .empty{text-align:center;color:var(--muted);padding:18px 6px}.results,.rankings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}.result-line,.rank-line{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:7px;min-height:44px;padding:9px 11px;border:1px solid #dce6f1;border-radius:10px;background:#f8fbff}.result-line span,.rank-line span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:650}.result-line b:last-child,.rank-line b:last-child{color:var(--blue);white-space:nowrap}.rank-line{grid-template-columns:30px minmax(0,1fr) auto}.rank-no{display:grid;place-items:center;width:27px;height:27px;border-radius:8px;background:#e3effc;color:var(--blue);font-size:.82rem}.rank-line:nth-child(1) .rank-no{background:#f8df91;color:#7b5300}.rank-line:nth-child(2) .rank-no{background:#e3e8ef;color:#4f5d6d}.rank-line:nth-child(3) .rank-no{background:#f3d2b9;color:#7a4825}
+    .footer-actions{display:flex;justify-content:center;margin-top:14px}.export-actions{margin-top:12px}.export-actions .btn{width:100%;min-height:48px;font-size:1.02rem}.mini{font-size:.82rem;padding:8px 11px}
+    @media(max-width:430px){.wrap{padding-inline:10px}.card{padding:14px}.people{gap:7px}.person{height:46px;font-size:.93rem}.row.compact{display:grid;grid-template-columns:1fr 1fr}.row.compact>*:first-child{grid-column:1/-1}.button-row{gap:6px}.btn{padding-inline:9px}.summary{gap:6px}.ballot-total-grid{gap:6px}.total-field{font-size:.74rem}.total-field input{font-size:.9rem}.cloud-login{grid-template-columns:1fr 1fr}.cloud-login .primary{grid-column:1/-1}.cloud-actions{gap:5px}.cloud-actions .btn{font-size:.76rem;padding-inline:2px}.cloud-actions .long-label{font-size:.67rem}.cloud-topline{gap:6px}.cloud-topline .btn{padding-inline:9px}}
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <header><h1>考核结果统计</h1><span class="badge" id="saveState">已自动保存</span></header>
+
+  <section class="card">
+    <h2 class="section-title"><span class="num">1</span>云同步</h2>
+    <form id="cloudLogin" class="cloud-login">
+      <input id="cloudEmail" type="email" placeholder="邮箱" autocomplete="username">
+      <input id="cloudPassword" type="password" placeholder="密码" autocomplete="current-password">
+      <button class="btn primary" type="submit">登录</button>
+    </form>
+    <div id="cloudAccount" class="hidden">
+      <div class="cloud-topline">
+        <span id="cloudUserText" class="cloud-user"></span>
+        <button id="syncNow" class="btn primary" type="button">立即同步</button>
+      </div>
+      <div class="cloud-actions">
+        <button id="downloadCloud" class="btn" type="button">下载云端</button>
+        <button id="uploadCloud" class="btn" type="button">上传本机</button>
+        <button id="restoreBackup" class="btn long-label" type="button">恢复最近数据</button>
+        <button id="logoutCloud" class="btn danger" type="button">退出登录</button>
+      </div>
+    </div>
+    <div id="cloudStatus" class="cloud-status">未登录，当前内容保存在本机。登录后自动同步。</div>
+  </section>
+
+  <section class="card">
+    <h2 class="section-title"><span class="num">2</span>统计表分类</h2>
+    <select id="category" aria-label="统计表分类"></select>
+    <div class="button-row category-actions">
+      <button class="btn" id="newCategory">新建</button>
+      <button class="btn" id="renameCategory">重命名</button>
+      <button class="btn danger" id="deleteCategory">删除</button>
+      <button class="btn" id="moveCategoryUp">上移</button>
+      <button class="btn" id="moveCategoryDown">下移</button>
+    </div>
+    <div class="ballot-total">
+      <h3 class="subsection-title">总票数统计</h3>
+      <div class="ballot-total-grid">
+        <label class="total-field">发出票数<input id="issuedBallots" type="text" inputmode="text" placeholder="例如 100"></label>
+        <label class="total-field">收回票数<input id="returnedBallots" type="text" value="0" readonly></label>
+        <label class="total-field">未收回票数<input id="missingBallots" type="text" value="0" readonly></label>
+      </div>
+      <textarea id="returnedParts" class="return-parts" placeholder="输入各批收回票数，例如：20，15/18；10，也可以输入普通文字"></textarea>
+      <p class="hint">逗号、分号、斜杠、空格或换行都可以；文本中的数字会自动相加并显示在上方。</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 class="section-title"><span class="num">3</span>本次选票</h2>
+    <textarea id="voteInput" class="vote-box" placeholder="点击下面的人名，会自动加入这里；也可以直接输入，每行一个姓名。"></textarea>
+    <button class="btn green submit" id="submitVote">提交本次选票并统计</button>
+    <div class="summary">
+      <div class="metric"><b id="selectedCount">0</b><span>本次已选</span></div>
+      <div class="metric"><b id="ballotCount">0</b><span>已提交选票</span></div>
+      <div class="metric"><b id="peopleCount">0</b><span>名单人数</span></div>
+    </div>
+    <div class="message" id="message" aria-live="polite"></div>
+  </section>
+
+  <section class="card">
+    <h2 class="section-title"><span class="num">4</span>人员名单</h2>
+    <div class="people" id="people"></div>
+  </section>
+
+  <section class="card">
+    <h2 class="section-title"><span class="num">5</span>人员票数</h2>
+    <input id="search" type="search" placeholder="搜索姓名，查看该人员票数">
+    <div class="search-result" id="searchResult"></div>
+    <div class="results" id="results"></div>
+    <div class="footer-actions"><button class="btn danger mini" id="resetVotes">清零人员票数</button></div>
+  </section>
+
+  <section class="card">
+    <h2 class="section-title"><span class="num">6</span>票数汇总</h2>
+    <div class="summary-name">
+      <label for="summaryPerson">人员姓名</label>
+      <div class="person-combo">
+        <input id="summaryPerson" type="text" placeholder="输入姓名或点击右侧箭头选择" autocomplete="off">
+        <button id="summaryPersonToggle" class="combo-toggle" type="button" aria-label="显示全部人员">▼</button>
+        <div id="summaryPersonMenu" class="combo-menu hidden"></div>
+      </div>
+    </div>
+    <div class="summary-result-grid">
+      <label class="total-field">汇总票数<input id="summaryVoteTotal" type="text" value="0" readonly></label>
+    </div>
+    <textarea id="summaryNumbers" class="return-parts" placeholder="输入这个人的各组票数，例如：8，12/15；也可以输入普通文字"></textarea>
+    <p class="hint">文本中的数字会自动相加，汇总结果直接参加下面的票数排名。</p>
+    <div class="summary-clear"><button class="btn danger mini" id="clearPersonSummary">清空汇总</button></div>
+  </section>
+
+  <section class="card">
+    <h2 class="section-title"><span class="num">7</span>票数排名</h2>
+    <div class="rankings" id="rankings"></div>
+    <p class="hint">只按照票数汇总结果从高到低排列，前面的人员票数不参与排名。</p>
+  </section>
+
+  <section class="card">
+    <h2 class="section-title"><span class="num">8</span>导入人员名单</h2>
+    <textarea id="rosterInput" class="roster-box" placeholder="每行输入一个姓名，也可以用逗号、顿号分隔"></textarea>
+    <div class="row compact" style="margin-top:9px">
+      <button class="btn primary" id="importManual">导入手动名单</button>
+      <label class="btn upload" style="display:grid;place-items:center;margin:0">上传 TXT<input id="txtFile" type="file" accept=".txt,text/plain"></label>
+      <button class="btn danger" id="clearRoster">清空名单</button>
+    </div>
+    <p class="hint">重新导入时，会补充新姓名，不会清除已有票数。</p>
+  </section>
+
+  <section class="card">
+    <h2 class="section-title"><span class="num">9</span>导出 Excel</h2>
+    <div class="export-actions"><button class="btn green" id="exportExcel">导出 Excel</button></div>
+    <p class="hint">导出当前云账号下的全部统计表，每个统计表分别保存为一个工作表。</p>
+  </section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const KEY = 'assessment_vote_counter_v1';
+  const BACKUP_KEY = KEY + '_cloud_backups';
+  const CLOUD_URL = 'https://braarnzywbodyfdclodc.supabase.co';
+  const CLOUD_KEY = 'sb_publishable_JecnrG-198PERwUD5lFhaQ_wc0vV4Lj';
+  const CLOUD_TABLE = 'assessment_vote_counter_v1';
+  let currentAccount = localStorage.getItem(KEY + '_account') || '默认账号';
+  let db = load();
+  let timer;
+  let cloudClient=null, cloudUser=null, cloudTimer=null, cloudBusy=false, applyingRemote=false;
+
+  function blankCategory(){ return {roster:[],counts:{},ballots:0,issuedText:'',returnedPartsText:'',summaryEntries:{},summaryActiveName:''}; }
+  function blankAccount(){ return {activeCategory:'默认统计表', categories:{'默认统计表':blankCategory()}}; }
+  function load(){ try{return JSON.parse(localStorage.getItem(KEY)) || {accounts:{}}}catch{return {accounts:{}}} }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(db)); localStorage.setItem(KEY+'_account',currentAccount); $('saveState').textContent='已自动保存'; scheduleCloudSync(); }
+  function accountData(){ db.accounts ||= {}; db.accounts[currentAccount] ||= blankAccount(); return db.accounts[currentAccount]; }
+  function normalizeCategory(c){ c ||= blankCategory(); c.roster ||= []; c.counts ||= {}; c.ballots ||= 0; c.issuedText ??= ''; c.returnedPartsText ??= ''; c.summaryEntries ||= {}; c.summaryActiveName ??= ''; return c; }
+  function catData(){ const a=accountData(); a.categories[a.activeCategory]=normalizeCategory(a.categories[a.activeCategory]); return a.categories[a.activeCategory]; }
+  function sumNumbers(text){ const found=String(text||'').match(/\d+(?:\.\d+)?/g); return found ? found.reduce((sum,value)=>sum+Number(value),0) : 0; }
+  function neatNumber(value){ return Number.isInteger(value) ? String(value) : String(Math.round(value*100)/100); }
+  function ballotTotals(c){ const issued=sumNumbers(c.issuedText),returned=sumNumbers(c.returnedPartsText); return {issued,returned,missing:issued-returned}; }
+  function refreshBallotTotals(c){ const totals=ballotTotals(c); $('returnedBallots').value=neatNumber(totals.returned); $('missingBallots').value=neatNumber(totals.missing); }
+  function summaryVote(c,name){ return sumNumbers(c.summaryEntries[name]||''); }
+  function summaryNames(c){ return [...new Set([...c.roster,...Object.keys(c.summaryEntries).filter(n=>n.trim())])]; }
+  function refreshSummaryTotals(c){ const name=$('summaryPerson').value.trim(),added=name?summaryVote(c,name):0; $('summaryVoteTotal').value=neatNumber(added); }
+  function refreshSummaryEditor(c){
+    const names=sortRoster(summaryNames(c)),active=names.includes(c.summaryActiveName)?c.summaryActiveName:(names[0]||'');
+    $('summaryPersonMenu').innerHTML=names.length?names.map(n=>`<button class="combo-option" type="button" data-name="${escapeAttr(n)}">${escapeHtml(n)}</button>`).join(''):'<div class="combo-empty">请先导入人员名单</div>';
+    c.summaryActiveName=active; $('summaryPerson').value=active; $('summaryNumbers').value=active?(c.summaryEntries[active]||''):''; refreshSummaryTotals(c);
+  }
+  function renderRankings(c){
+    const ranked=Object.keys(c.summaryEntries).filter(n=>n.trim()).sort((x,y)=>summaryVote(c,y)-summaryVote(c,x)||pinyinCollator.compare(x,y));
+    $('rankings').innerHTML=ranked.length ? ranked.map((n,i)=>`<div class="rank-line"><b class="rank-no">${i+1}</b><span>${escapeHtml(n)}</span><b>${neatNumber(summaryVote(c,n))} 票</b></div>`).join('') : '<div class="empty" style="grid-column:1/-1">请先录入人员的汇总票数</div>';
+  }
+  function namesFrom(text){ return [...new Set(text.split(/[\n,，、;；\t]+/).map(x=>x.trim()).filter(Boolean))]; }
+  function voteNames(){ return $('voteInput').value.split(/[\n,，、;；\t]+/).map(x=>x.trim()).filter(Boolean); }
+  const pinyinCollator=new Intl.Collator('zh-CN-u-co-pinyin');
+  const initialLetters='ABCDEFGHJKLMNOPQRSTWXYZ';
+  const initialBounds=['阿','芭','擦','搭','蛾','发','噶','哈','击','喀','垃','妈','拿','哦','啪','期','然','撒','塌','挖','昔','压','匝'];
+  function nameInitial(name){
+    const ch=(name.trim()[0]||'').toUpperCase();
+    if(/[A-Z]/.test(ch)) return ch;
+    for(let i=0;i<initialBounds.length;i++) if(pinyinCollator.compare(ch,initialBounds[i])>=0&&(i===initialBounds.length-1||pinyinCollator.compare(ch,initialBounds[i+1])<0)) return initialLetters[i];
+    return '#';
+  }
+  function sortRoster(list){ return list.sort((a,b)=>nameInitial(a).localeCompare(nameInitial(b),'en')||pinyinCollator.compare(a,b)); }
+  function reorderCategories(account,names){ const ordered={}; names.forEach(n=>ordered[n]=account.categories[n]); account.categories=ordered; }
+  function moveCategory(direction){
+    const a=accountData(), names=Object.keys(a.categories), from=names.indexOf(a.activeCategory), to=from+direction;
+    if(to<0) return toast('已经是第一个统计表',true);
+    if(to>=names.length) return toast('已经是最后一个统计表',true);
+    [names[from],names[to]]=[names[to],names[from]]; reorderCategories(a,names); render(); toast(direction<0?'已上移':'已下移');
+  }
+  function peopleHtml(roster,selected){
+    let last=''; return sortRoster([...roster]).map(n=>{const letter=nameInitial(n),head=letter!==last?`<div class="letter-group"><span class="letter-mark">${letter}</span></div>`:'';last=letter;return head+`<button class="person ${n.length>=4?'long':''} ${selected.has(n)?'selected':''}" data-name="${escapeAttr(n)}">${escapeHtml(n)}</button>`}).join('');
+  }
+  function toast(t, bad=false){ clearTimeout(timer); $('message').textContent=t; $('message').style.color=bad?'var(--danger)':'var(--ok)'; timer=setTimeout(()=>$('message').textContent='',2600); }
+  function render(){
+    const a=accountData(), c=catData();
+    $('category').innerHTML=Object.keys(a.categories).map(n=>`<option ${n===a.activeCategory?'selected':''}>${escapeHtml(n)}</option>`).join('');
+    $('issuedBallots').value=c.issuedText; $('returnedParts').value=c.returnedPartsText; refreshBallotTotals(c);
+    const selected=new Set(voteNames());
+    c.roster=sortRoster(c.roster);
+    $('people').innerHTML=c.roster.length ? peopleHtml(c.roster,selected) : '<div class="empty" style="grid-column:1/-1">请先手动输入或上传 TXT 人员名单</div>';
+    const alphabetical=sortRoster([...c.roster].filter(n=>(Number(c.counts[n])||0)>0));
+    $('results').innerHTML=alphabetical.length ? alphabetical.map(n=>`<div class="result-line"><span>${escapeHtml(n)}</span><b>${c.counts[n]||0} 票</b></div>`).join('') : '<div class="empty" style="grid-column:1/-1">暂无已得票人员</div>';
+    refreshSummaryEditor(c); renderRankings(c);
+    $('selectedCount').textContent=voteNames().length; $('ballotCount').textContent=c.ballots||0; $('peopleCount').textContent=c.roster.length;
+    searchNow(); save();
+  }
+  function escapeHtml(s){ return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  function escapeAttr(s){ return escapeHtml(s); }
+  function searchNow(){ const q=$('search').value.trim(), box=$('searchResult'), c=catData(); if(!q){box.style.display='none';return} const hits=c.roster.filter(n=>n.includes(q)); box.style.display='block'; box.innerHTML=hits.length?hits.map(n=>`<div><strong>${escapeHtml(n)}</strong>：${c.counts[n]||0} 票</div>`).join(''):'未找到该人员'; }
+  function xmlText(value){ return String(value??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[m])); }
+  function safeSheetNames(names){
+    const used=new Set(); return names.map((name,index)=>{let base=name.replace(/[\\/?*\[\]:]/g,' ').trim().slice(0,31)||`统计表${index+1}`,sheet=base,n=2;while(used.has(sheet)){const tail=`_${n++}`;sheet=base.slice(0,31-tail.length)+tail}used.add(sheet);return sheet});
+  }
+  const utf8=new TextEncoder();
+  const crcTable=(()=>{const table=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=(c&1)?0xedb88320^(c>>>1):c>>>1;table[n]=c>>>0}return table})();
+  function crc32(bytes){let c=0xffffffff;for(const b of bytes)c=crcTable[(c^b)&255]^(c>>>8);return (c^0xffffffff)>>>0}
+  function u16(n){return Uint8Array.of(n&255,(n>>>8)&255)}
+  function u32(n){return Uint8Array.of(n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255)}
+  function joinBytes(parts){const size=parts.reduce((n,p)=>n+p.length,0),out=new Uint8Array(size);let at=0;for(const p of parts){out.set(p,at);at+=p.length}return out}
+  function makeZip(files){
+    const local=[],central=[];let offset=0;
+    const now=new Date(),dosTime=(now.getHours()<<11)|(now.getMinutes()<<5)|(now.getSeconds()>>1),dosDate=((now.getFullYear()-1980)<<9)|((now.getMonth()+1)<<5)|now.getDate();
+    for(const file of files){
+      const name=utf8.encode(file.name),data=utf8.encode(file.text),crc=crc32(data),flags=0x0800;
+      const head=joinBytes([u32(0x04034b50),u16(20),u16(flags),u16(0),u16(dosTime),u16(dosDate),u32(crc),u32(data.length),u32(data.length),u16(name.length),u16(0),name]);
+      local.push(head,data);
+      central.push(joinBytes([u32(0x02014b50),u16(20),u16(20),u16(flags),u16(0),u16(dosTime),u16(dosDate),u32(crc),u32(data.length),u32(data.length),u16(name.length),u16(0),u16(0),u16(0),u16(0),u32(0),u32(offset),name]));
+      offset+=head.length+data.length;
+    }
+    const centralSize=central.reduce((n,p)=>n+p.length,0),end=joinBytes([u32(0x06054b50),u16(0),u16(0),u16(files.length),u16(files.length),u32(centralSize),u32(offset),u16(0)]);
+    return new Blob([...local,...central,end],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  }
+  function columnName(index){let name='';for(let n=index+1;n;n=Math.floor((n-1)/26))name=String.fromCharCode(65+(n-1)%26)+name;return name}
+  function xlsxCell(value,row,col,style=0){
+    const ref=columnName(col)+(row+1),styleAttr=style?` s="${style}"`:'';
+    if(typeof value==='number'&&Number.isFinite(value))return `<c r="${ref}"${styleAttr}><v>${value}</v></c>`;
+    return `<c r="${ref}" t="inlineStr"${styleAttr}><is><t xml:space="preserve">${xmlText(value)}</t></is></c>`;
+  }
+  function sheetXml(rows){
+    const body=rows.map((cells,r)=>cells?`<row r="${r+1}">${cells.map((cell,c)=>xlsxCell(cell.v,r,c,cell.s||0)).join('')}</row>`:`<row r="${r+1}"/>`).join('');
+    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="8" topLeftCell="A9" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="18"/><cols><col min="1" max="1" width="8" customWidth="1"/><col min="2" max="2" width="18" customWidth="1"/><col min="3" max="3" width="11" customWidth="1"/><col min="4" max="5" width="13" customWidth="1"/></cols><sheetData>${body}</sheetData></worksheet>`;
+  }
+  function exportExcel(){
+    const a=accountData(), categoryNames=Object.keys(a.categories), sheetNames=safeSheetNames(categoryNames);
+    const sheetFiles=categoryNames.map((category,index)=>{
+      const c=normalizeCategory(a.categories[category]), roster=sortRoster(summaryNames(c)), totals=ballotTotals(c);
+      const rows=[
+        [{v:'云账号',s:2},{v:currentAccount}],
+        [{v:'统计表分类',s:2},{v:category}],
+        [{v:'已提交选票',s:2},{v:c.ballots||0}],
+        [{v:'发出票数',s:2},{v:totals.issued}],
+        [{v:'收回票数',s:2},{v:totals.returned}],
+        [{v:'未收回票数',s:2},{v:totals.missing}],
+        null,
+        ['序号','姓名','首字母','人员票数','汇总票数'].map(v=>({v,s:1})),
+        ...roster.map((name,i)=>[{v:i+1},{v:name},{v:nameInitial(name)},{v:Number(c.counts[name])||0},{v:summaryVote(c,name)}])
+      ];
+      return {name:`xl/worksheets/sheet${index+1}.xml`,text:sheetXml(rows)};
+    });
+    const contentTypes=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${sheetFiles.map((_,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}</Types>`;
+    const rootRels=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`;
+    const workbook=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${sheetNames.map((n,i)=>`<sheet name="${xmlText(n)}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join('')}</sheets></workbook>`;
+    const workbookRels=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${sheetFiles.map((_,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join('')}<Relationship Id="rId${sheetFiles.length+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`;
+    const styles=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="3"><font><sz val="11"/><name val="Microsoft YaHei"/></font><font><b/><color rgb="FFFFFFFF"/><sz val="11"/><name val="Microsoft YaHei"/></font><font><b/><color rgb="FF174C8F"/><sz val="11"/><name val="Microsoft YaHei"/></font></fonts><fills count="4"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF174C8F"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFEAF3FC"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf><xf numFmtId="0" fontId="2" fillId="3" borderId="0" xfId="0" applyFont="1" applyFill="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
+    const blob=makeZip([{name:'[Content_Types].xml',text:contentTypes},{name:'_rels/.rels',text:rootRels},{name:'xl/workbook.xml',text:workbook},{name:'xl/_rels/workbook.xml.rels',text:workbookRels},{name:'xl/styles.xml',text:styles},...sheetFiles]),url=URL.createObjectURL(blob),link=document.createElement('a'),day=new Date().toISOString().slice(0,10);
+    link.href=url;link.download=`考核结果统计_${currentAccount}_${day}.xlsx`;document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);toast(`已导出 ${categoryNames.length} 个统计表（XLSX）`);
+  }
+
+  $('category').onchange=e=>{accountData().activeCategory=e.target.value;$('voteInput').value='';render()};
+  $('newCategory').onclick=()=>{const n=prompt('请输入新统计表名称');if(!n?.trim())return;const a=accountData(),v=n.trim();if(a.categories[v])return alert('该名称已存在');a.categories[v]=blankCategory();a.activeCategory=v;$('voteInput').value='';render()};
+  $('renameCategory').onclick=()=>{const a=accountData(),old=a.activeCategory,n=prompt('请输入新名称',old)?.trim();if(!n||n===old)return;if(a.categories[n])return alert('该名称已存在');const names=Object.keys(a.categories).map(x=>x===old?n:x),data=a.categories[old];delete a.categories[old];a.categories[n]=data;reorderCategories(a,names);a.activeCategory=n;render()};
+  $('deleteCategory').onclick=()=>{const a=accountData(),keys=Object.keys(a.categories);if(keys.length===1)return alert('至少保留一个统计表');if(!confirm('确定删除“'+a.activeCategory+'”及其全部统计数据吗？'))return;delete a.categories[a.activeCategory];a.activeCategory=Object.keys(a.categories)[0];$('voteInput').value='';render()};
+  $('moveCategoryUp').onclick=()=>moveCategory(-1);
+  $('moveCategoryDown').onclick=()=>moveCategory(1);
+  $('issuedBallots').oninput=e=>{const c=catData();c.issuedText=e.target.value;refreshBallotTotals(c);save()};
+  $('returnedParts').oninput=e=>{const c=catData();c.returnedPartsText=e.target.value;refreshBallotTotals(c);save()};
+  $('summaryPerson').onchange=e=>{const c=catData(),name=e.target.value.trim();c.summaryActiveName=name;$('summaryNumbers').value=name?(c.summaryEntries[name]||''):'';refreshSummaryTotals(c);save()};
+  $('summaryPersonToggle').onclick=()=>{$('summaryPersonMenu').classList.toggle('hidden')};
+  $('summaryPersonMenu').onclick=e=>{const option=e.target.closest('.combo-option');if(!option)return;$('summaryPerson').value=option.dataset.name;$('summaryPersonMenu').classList.add('hidden');$('summaryPerson').dispatchEvent(new Event('change'))};
+  document.addEventListener('click',e=>{if(!e.target.closest('.person-combo'))$('summaryPersonMenu').classList.add('hidden')});
+  $('summaryNumbers').oninput=e=>{const c=catData(),name=$('summaryPerson').value.trim();if(!name){$('summaryVoteTotal').value='0';return}c.summaryActiveName=name;c.summaryEntries[name]=e.target.value;refreshSummaryTotals(c);renderRankings(c);save()};
+  $('clearPersonSummary').onclick=()=>{if(!confirm('确定清空当前统计表中所有人员的汇总票数吗？'))return;const c=catData(),name=$('summaryPerson').value.trim();c.summaryEntries={};c.summaryActiveName=c.roster.includes(name)?name:'';$('summaryNumbers').value='';render();toast('汇总票数已全部清空')};
+  $('importManual').onclick=()=>{const ns=namesFrom($('rosterInput').value);if(!ns.length)return toast('请先输入人员名单',true);const c=catData();c.roster=[...new Set([...c.roster,...ns])];c.roster.forEach(n=>c.counts[n]??=0);$('rosterInput').value='';render();toast('已导入 '+ns.length+' 人')};
+  $('txtFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{$('rosterInput').value=await f.text();$('importManual').click()}catch{toast('TXT 文件读取失败',true)}e.target.value=''};
+  $('clearRoster').onclick=()=>{if(!confirm('确定清空当前分类的人员名单和全部票数吗？'))return;const c=catData();c.roster=[];c.counts={};c.ballots=0;c.summaryEntries={};c.summaryActiveName='';$('voteInput').value='';render()};
+  $('people').onclick=e=>{const b=e.target.closest('.person');if(!b)return;const n=b.dataset.name, arr=voteNames(),i=arr.indexOf(n);if(i>=0)arr.splice(i,1);else arr.push(n);$('voteInput').value=arr.join('\n');render()};
+  $('voteInput').oninput=()=>{const c=catData();$('selectedCount').textContent=voteNames().length;document.querySelectorAll('.person').forEach(b=>b.classList.toggle('selected',voteNames().includes(b.dataset.name)))};
+  $('submitVote').onclick=()=>{const list=voteNames(),c=catData();if(!list.length)return toast('本次选票还没有选择人员',true);const unknown=list.filter(n=>!c.roster.includes(n));if(unknown.length&&!confirm('名单中没有：'+unknown.join('、')+'。是否仍然加入名单并统计？'))return;unknown.forEach(n=>{c.roster.push(n);c.counts[n]=0});list.forEach(n=>c.counts[n]=(c.counts[n]||0)+1);c.ballots=(c.ballots||0)+1;$('voteInput').value='';render();toast('第 '+c.ballots+' 张选票已提交，共统计 '+list.length+' 人')};
+  $('search').oninput=searchNow;
+  $('resetVotes').onclick=()=>{if(!confirm('确定将当前分类的人员票数清零吗？人员名单和票数汇总会保留。'))return;const c=catData();c.roster.forEach(n=>c.counts[n]=0);c.ballots=0;$('voteInput').value='';render();toast('人员票数已清零')};
+  $('exportExcel').onclick=exportExcel;
+
+  function setCloudStatus(text){ $('cloudStatus').textContent=text; }
+  function updateCloudUI(){
+    if(cloudUser){
+      $('cloudLogin').classList.add('hidden'); $('cloudAccount').classList.remove('hidden');
+      $('cloudUserText').textContent='✅ 已登录：'+(cloudUser.email||'云账号');
+    }else{
+      $('cloudLogin').classList.remove('hidden'); $('cloudAccount').classList.add('hidden'); $('cloudUserText').textContent='';
+    }
+  }
+  function pushCloudBackup(reason){
+    try{let arr=JSON.parse(localStorage.getItem(BACKUP_KEY)||'[]');if(!Array.isArray(arr))arr=[];arr.unshift({savedAt:Date.now(),reason:reason||'自动备份',db:JSON.parse(JSON.stringify(db)),currentAccount});localStorage.setItem(BACKUP_KEY,JSON.stringify(arr.slice(0,5)))}catch{}
+  }
+  function scheduleCloudSync(){
+    if(applyingRemote||!cloudUser||!cloudClient)return;
+    clearTimeout(cloudTimer); cloudTimer=setTimeout(()=>syncCloud(false,false),1000);
+  }
+  async function fetchRemote(){
+    const r=await cloudClient.from(CLOUD_TABLE).select('payload,updated_at').eq('user_id',cloudUser.id).maybeSingle();
+    if(r.error)throw r.error; return r.data;
+  }
+  async function uploadRemote(){
+    const r=await cloudClient.from(CLOUD_TABLE).upsert({user_id:cloudUser.id,payload:{appVersion:'assessment_vote_counter_v1',db,currentAccount},updated_at:new Date().toISOString()},{onConflict:'user_id'});
+    if(r.error)throw r.error;
+  }
+  async function applyRemotePayload(payload){
+    if(!payload||!payload.db||!payload.db.accounts)return false;
+    applyingRemote=true;
+    try{pushCloudBackup('云端覆盖前自动备份');db=payload.db;currentAccount=payload.currentAccount||cloudUser.email||'云账号';$('voteInput').value='';render()}finally{applyingRemote=false}
+    return true;
+  }
+  async function syncCloud(manual,preferRemote){
+    if(!cloudUser||!cloudClient||cloudBusy)return; cloudBusy=true;
+    try{
+      setCloudStatus('正在同步…'); const row=await fetchRemote(),payload=row&&row.payload?row.payload:null;
+      if(payload&&payload.db&&preferRemote!==false){await applyRemotePayload(payload);setCloudStatus('✅ 已从云端下载最新数据')}
+      else{await uploadRemote();setCloudStatus(payload?'✅ 本机数据已上传云端':'✅ 云端原来为空，已上传本机数据')}
+    }catch(e){console.error(e);setCloudStatus('⚠️ 云同步失败：'+(e&&e.message?e.message:'请检查网络'))}finally{cloudBusy=false}
+  }
+  $('cloudLogin').onsubmit=async e=>{
+    e.preventDefault(); if(!cloudClient)return setCloudStatus('云同步组件未加载');
+    const email=$('cloudEmail').value.trim(),password=$('cloudPassword').value;if(!email||!password)return setCloudStatus('请输入邮箱和密码');
+    setCloudStatus('正在登录…'); const r=await cloudClient.auth.signInWithPassword({email,password});if(r.error)return setCloudStatus('登录失败：'+r.error.message);
+    cloudUser=r.data.session.user;currentAccount=cloudUser.email||cloudUser.id;$('cloudPassword').value='';updateCloudUI();await syncCloud(true,true);render();
+  };
+  $('syncNow').onclick=()=>syncCloud(true,true);
+  $('downloadCloud').onclick=async()=>{if(!confirm('下载云端数据到本机？\n当前本机数据会先自动备份。'))return;await syncCloud(true,true)};
+  $('uploadCloud').onclick=async()=>{if(!confirm('把当前本机数据上传到云端？\n这会覆盖云端当前数据。'))return;pushCloudBackup('上传云端前自动备份');await syncCloud(true,false)};
+  $('restoreBackup').onclick=()=>{
+    try{const arr=JSON.parse(localStorage.getItem(BACKUP_KEY)||'[]');if(!Array.isArray(arr)||!arr.length)return alert('目前没有可恢复的本机备份。');const b=arr[0],time=new Date(b.savedAt).toLocaleString();if(!confirm('恢复最近一次备份？\n备份时间：'+time+'\n原因：'+(b.reason||'自动备份')))return;pushCloudBackup('恢复备份前');db=b.db;currentAccount=b.currentAccount||currentAccount;$('voteInput').value='';render();setCloudStatus('✅ 已恢复最近数据，稍后会自动同步。')}catch(e){alert('恢复失败：'+(e&&e.message?e.message:'未知错误'))}
+  };
+  $('logoutCloud').onclick=async()=>{if(cloudClient)await cloudClient.auth.signOut();cloudUser=null;updateCloudUI();setCloudStatus('已退出登录，内容仍保存在本机。')};
+  render();
+  (async()=>{
+    try{
+      if(!window.supabase||!window.supabase.createClient){setCloudStatus('云同步组件未加载，本机功能仍可使用。');return}
+      cloudClient=window.supabase.createClient(CLOUD_URL,CLOUD_KEY,{auth:{storageKey:'assessment-vote-counter-auth-v1',persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+      const r=await cloudClient.auth.getSession();if(r.error)throw r.error;cloudUser=r.data.session?r.data.session.user:null;
+      if(cloudUser){currentAccount=cloudUser.email||cloudUser.id;updateCloudUI();await syncCloud(true,true);render()}else updateCloudUI();
+      cloudClient.auth.onAuthStateChange((event)=>{if(event==='SIGNED_OUT'){cloudUser=null;updateCloudUI()}});
+    }catch(e){console.error(e);setCloudStatus('云同步初始化失败，本机功能仍可使用。')}
+  })();
+})();
+</script>
+</body>
+</html>
